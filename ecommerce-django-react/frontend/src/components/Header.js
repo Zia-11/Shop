@@ -1,29 +1,15 @@
 import React from "react";
-
-/* REACT BOOTSTRAP */
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
-
-/* REACT ROUTER BOOTSTRAP */
 import { LinkContainer } from "react-router-bootstrap";
-
-/* REACT - REDUX */
 import { useDispatch, useSelector } from "react-redux";
-
-/* ACTION CREATORS */
 import { logout } from "../actions/userActions";
-
-/* COMPONENTS */
 import SearchBox from "./SearchBox";
-
 import logo from "../logo.png";
 
 function Header() {
-  /* PULLING A PART OF STATE FROM THE ACTUAL STATE IN THE REDUX STORE */
-  const userLogin = useSelector((state) => state.userLogin);
-  const { userInfo } = userLogin;
-
-  /* HANDLER */
   const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.userLogin) || {};
+
   const logoutHandler = () => {
     dispatch(logout());
   };
@@ -34,20 +20,18 @@ function Header() {
         <Container>
           <LinkContainer to="/">
             <Navbar.Brand>
-              <img src={logo} alt="Магазин Отаку" />
+              <img src={logo} alt="logo" height="30" />
             </Navbar.Brand>
           </LinkContainer>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            {/* Левый Nav: тут только поиск */}
+            <Nav className="mr-auto">
+              <SearchBox />
+            </Nav>
 
-          <Navbar.Toggle aria-controls="navbarScroll" />
-
-          <Navbar.Collapse id="navbarScroll">
-            <SearchBox />
-
-            <Nav
-              className="ms-auto my-2 my-lg-0"
-              style={{ maxHeight: "100px" }}
-              navbarScroll
-            >
+            {/* Правый Nav: корзина и профиль */}
+            <Nav className="ml-auto">
               <LinkContainer to="/cart">
                 <Nav.Link>
                   <i className="fas fa-shopping-cart"></i> Корзина
@@ -59,7 +43,6 @@ function Header() {
                   <LinkContainer to="/profile">
                     <NavDropdown.Item>Профиль</NavDropdown.Item>
                   </LinkContainer>
-
                   <NavDropdown.Item onClick={logoutHandler}>
                     Выйти
                   </NavDropdown.Item>
@@ -77,11 +60,9 @@ function Header() {
                   <LinkContainer to="/admin/userlist">
                     <NavDropdown.Item>Пользователи</NavDropdown.Item>
                   </LinkContainer>
-
                   <LinkContainer to="/admin/productlist">
                     <NavDropdown.Item>Товары</NavDropdown.Item>
                   </LinkContainer>
-
                   <LinkContainer to="/admin/orderlist">
                     <NavDropdown.Item>Заказы</NavDropdown.Item>
                   </LinkContainer>
