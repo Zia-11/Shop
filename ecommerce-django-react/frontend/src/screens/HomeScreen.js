@@ -3,27 +3,29 @@
 import React, { useEffect } from "react";
 import { Row, Col, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  listProducts,
-  listProductCategories,
-} from "../actions/productActions";
+import { listProducts, listProductCategories } from "../actions/productActions";
 import Product from "../components/Product";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
+import { useParams, useLocation, useHistory } from "react-router-dom";
 
-function HomeScreen({ match, location, history }) {
+function HomeScreen() {
   const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
 
-  // достаём прямо из route-параметров
-  const category = match.params.category || "";
-  const pageNumber = match.params.pageNumber || 1;
+  // читаем из URL
+  const { category = "" } = useParams();
+  const keyword = params.get("keyword") || "";
+  const pageNumber = params.get("page") || 1;
 
-  // определяем домашняя ли это страница (чтобы не показывать карусель на /page/2)
+  // узнаём, главная ли страница
   const isHomePage = location.pathname === "/";
 
-  // стейт
+  // стейты из Redux
   const { loading, error, products, page, pages } = useSelector(
     (state) => state.productList
   );
@@ -33,14 +35,15 @@ function HomeScreen({ match, location, history }) {
     categories,
   } = useSelector((state) => state.productCategoryList);
 
+  // грузим категории и продукты при изменении keyword/category/pageNumber
   useEffect(() => {
     dispatch(listProductCategories());
-    dispatch(listProducts(category, pageNumber));
-  }, [dispatch, category, pageNumber]);
+    dispatch(listProducts(keyword, category, pageNumber));
+  }, [dispatch, keyword, category, pageNumber]);
 
   return (
     <>
-      {/* Карусель только на корневой */}
+      {/* Карусель — только на корневой */}
       {isHomePage && <ProductCarousel />}
 
       {/* Фильтр по категориям */}
@@ -63,7 +66,13 @@ function HomeScreen({ match, location, history }) {
                 <Button
                   key={c}
                   variant={category === c ? "dark" : "light"}
-                  onClick={() => history.push(`/category/${c}`)}
+                  onClick={() =>
+                    history.push(
+                      category === ""
+                        ? `/category/${c}${keyword ? `?keyword=${keyword}` : ""}`
+                        : `/category/${c}?keyword=${keyword}`
+                    )
+                  }
                   className="me-2 mb-2"
                 >
                   {c}
@@ -103,6 +112,7 @@ function HomeScreen({ match, location, history }) {
             page={page}
             pages={pages}
             category={category}
+            keyword={keyword}
           />
         </>
       )}

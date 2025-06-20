@@ -1,3 +1,5 @@
+// src/components/ProductCarousel.js
+
 import React, { useEffect } from "react";
 /* REACT BOOTSTRAP */
 import { Carousel, Image } from "react-bootstrap";
@@ -25,7 +27,12 @@ function ProductCarousel() {
   if (error) return <Message variant="danger">{error}</Message>;
 
   return (
-    <Carousel pause="hover" className="bg-dark">
+    <Carousel
+      pause="hover"
+      className="bg-dark"
+      controls={false}     
+      indicators={false}    
+    >
       {products.map((product) => (
         <Carousel.Item key={product._id}>
           <Link to={`/product/${product._id}`}>

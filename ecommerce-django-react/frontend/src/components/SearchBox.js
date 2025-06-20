@@ -1,19 +1,21 @@
+// src/components/SearchBox.js
+
 import React, { useState } from "react";
-/* REACT BOOTSTRAP */
-import { Button, Form } from "react-bootstrap";
-/* REACT ROUTER DOM */
-import { useHistory } from "react-router-dom";
+import { Form, Button } from "react-bootstrap";
+import { useHistory, useParams } from "react-router-dom";
 
 function SearchBox() {
   const [keyword, setKeyword] = useState("");
-  let history = useHistory();
+  const history = useHistory();
+  const { category = "" } = useParams();
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (keyword) {
-      history.push(`/?keyword=${keyword}&page=1`);
+    const query = keyword.trim() ? `?keyword=${keyword.trim()}&page=1` : "";
+    if (category) {
+      history.push(`/category/${category}${query}`);
     } else {
-      history.push(history.location.pathname);
+      history.push(`/${query}`);
     }
   };
 
@@ -23,14 +25,10 @@ function SearchBox() {
         type="text"
         name="q"
         onChange={(e) => setKeyword(e.target.value)}
-        className="me-2"
         placeholder="Поиск товаров…"
+        className="me-2"
       />
-      <Button
-        type="submit"
-        variant="outline-success"
-        className="p-2 search-btn"
-      >
+      <Button type="submit" className="p-2 search-btn">
         Поиск
       </Button>
     </Form>

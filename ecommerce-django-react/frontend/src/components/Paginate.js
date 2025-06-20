@@ -1,36 +1,32 @@
 // src/components/Paginate.js
 
 import React from "react";
-/* REACT BOOTSTRAP */
 import { Pagination } from "react-bootstrap";
-/* REACT ROUTER BOOTSTRAP */
 import { LinkContainer } from "react-router-bootstrap";
 
-/**
- * props:
- *  - page: текущий номер
- *  - pages: всего страниц
- *  - category: фильтр (если пусто — выводим все товары)
- */
-const Paginate = ({ page, pages, category = "" }) => {
+const Paginate = ({ page, pages, category = "", keyword = "" }) => {
   if (pages <= 1) return null;
+
+  // хелпер для формирования ссылки
+  const getLink = (pageNumber) => {
+    const query = `?keyword=${keyword}&page=${pageNumber}`;
+    return category
+      ? `/category/${category}${query}`
+      : `/${query}`;
+  };
 
   return (
     <Pagination className="justify-content-center">
-      {[...Array(pages).keys()].map((x) => (
-        <LinkContainer
-          key={x + 1}
-          to={
-            category
-              ? `/category/${category}/page/${x + 1}`
-              : `/page/${x + 1}`
-          }
-        >
-          <Pagination.Item active={x + 1 === page}>
-            {x + 1}
-          </Pagination.Item>
-        </LinkContainer>
-      ))}
+      {[...Array(pages).keys()].map((x) => {
+        const pageNum = x + 1;
+        return (
+          <LinkContainer key={pageNum} to={getLink(pageNum)}>
+            <Pagination.Item active={pageNum === page}>
+              {pageNum}
+            </Pagination.Item>
+          </LinkContainer>
+        );
+      })}
     </Pagination>
   );
 };

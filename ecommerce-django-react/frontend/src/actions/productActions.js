@@ -30,14 +30,14 @@ import {
 } from "../constants/productConstants";
 
 /* КРЕАТОР ДЕЙСТВИЯ ДЛЯ HomeScreen */
-export const listProducts = (category = '', pageNumber = '') => async (dispatch) => {
+export const listProducts = (keyword = '', category = '', pageNumber = '') => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_LIST_REQUEST });
 
     const { data } = await axios.get(
-      `/api/products?category=${category}&pageNumber=${pageNumber}`
-    );
-
+          `/api/products?keyword=${keyword}&category=${category}&page=${pageNumber}`
+         );
+      
     dispatch({
       type: PRODUCT_LIST_SUCCESS,
       payload: data,
