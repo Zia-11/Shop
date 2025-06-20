@@ -5,17 +5,27 @@ from .models import Product, Review, Order, OrderItem, ShippingAddress
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
-        'user',         # ← именно имя поля в модели, lowercase
+        'user_name',   
+        'user_email', 
         'createdAt',
         'totalPrice',
         'isPaid',
         'isDeliver',
     )
     list_filter = ('isPaid', 'isDeliver', 'createdAt')
-    search_fields = ('user__username', '_id')
     readonly_fields = ('createdAt', 'paidAt', 'deliveredAt')
 
-# (Опционально: чтобы вам было удобно смотреть и связанные объекты)
+    def user_name(self, obj):
+        # показываем либо first_name, либо username на всякий случай
+        return obj.user.first_name or obj.user.username
+    user_name.short_description = 'Name'
+
+    def user_email(self, obj):
+        # если вдруг e-mail ещё не заполнен, вернёт пустую строку
+        return obj.user.email
+    user_email.short_description = 'E-mail'
+
+# остальное без изменений
 admin.site.register(OrderItem)
 admin.site.register(ShippingAddress)
 
@@ -26,7 +36,6 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'brand', 'category', '_id')
     readonly_fields = ('createdAt',)
 
-# Если хотите видеть отзывы в отдельной секции:
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('product', 'user', 'rating', 'createdAt', '_id')

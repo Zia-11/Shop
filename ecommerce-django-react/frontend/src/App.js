@@ -1,3 +1,5 @@
+// src/App.js
+
 import React from "react";
 /* REACT BOOTSTRAP */
 import { Container } from "react-bootstrap";
@@ -31,7 +33,28 @@ function App() {
       <Header />
       <Container>
         <main className="py-3">
+          {/* спец. роут для фильтрации + пагинации */}
+          <Route
+            exact
+            path="/category/:category/page/:pageNumber"
+            component={HomeScreen}
+          />
+          {/* только категория */}
+          <Route
+            exact
+            path="/category/:category"
+            component={HomeScreen}
+          />
+          {/* только пагинация (все товары) */}
+          <Route
+            exact
+            path="/page/:pageNumber"
+            component={HomeScreen}
+          />
+          {/* главная */}
           <Route exact path="/" component={HomeScreen} />
+
+          {/* прочие экраны */}
           <Route path="/login" component={LoginScreen} />
           <Route path="/register" component={RegisterScreen} />
           <Route path="/profile" component={ProfileScreen} />
@@ -43,9 +66,18 @@ function App() {
           <Route path="/cart/:id?" component={CartScreen} />
           <Route path="/admin/userlist" component={UserListScreen} />
           <Route path="/admin/user/:id/edit" component={UserEditScreen} />
-          <Route path="/admin/productlist" component={ProductListScreen} />
-          <Route path="/admin/product/:id/edit" component={ProductEditScreen} />
-          <Route path="/admin/orderlist" component={OrderListScreen} />
+          <Route
+            path="/admin/productlist"
+            component={ProductListScreen}
+          />
+          <Route
+            path="/admin/product/:id/edit"
+            component={ProductEditScreen}
+          />
+          <Route
+            path="/admin/orderlist"
+            component={OrderListScreen}
+          />
         </main>
       </Container>
       <Footer />

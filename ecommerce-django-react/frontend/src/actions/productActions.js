@@ -24,31 +24,35 @@ import {
   PRODUCT_TOP_REQUEST,
   PRODUCT_TOP_SUCCESS,
   PRODUCT_TOP_FAIL,
+  PRODUCT_CATEGORY_LIST_REQUEST,
+  PRODUCT_CATEGORY_LIST_SUCCESS,
+  PRODUCT_CATEGORY_LIST_FAIL,
 } from "../constants/productConstants";
 
 /* КРЕАТОР ДЕЙСТВИЯ ДЛЯ HomeScreen */
-export const listProducts =
-  (keyword = "") =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: PRODUCT_LIST_REQUEST });
+export const listProducts = (category = '', pageNumber = '') => async (dispatch) => {
+  try {
+    dispatch({ type: PRODUCT_LIST_REQUEST });
 
-      const { data } = await axios.get(`/api/products${keyword}`);
+    const { data } = await axios.get(
+      `/api/products?category=${category}&pageNumber=${pageNumber}`
+    );
 
-      dispatch({
-        type: PRODUCT_LIST_SUCCESS,
-        payload: data,
-      });
-    } catch (error) {
-      dispatch({
-        type: PRODUCT_LIST_FAIL,
-        payload:
-          error.response && error.response.data.detail
-            ? error.response.data.detail
-            : error.message,
-      });
-    }
-  };
+    dispatch({
+      type: PRODUCT_LIST_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_LIST_FAIL,
+      payload:
+        error.response && error.response.data.detail
+          ? error.response.data.detail
+          : error.message,
+    });
+  }
+};
+
 
 /* КРЕАТОР ДЕЙСТВИЯ ДЛЯ ProductScreen */
 export const listProductDetails = (id) => async (dispatch) => {
@@ -236,3 +240,24 @@ export const listTopProducts = () => async (dispatch) => {
     });
   }
 };
+
+export const listProductCategories = () => async (dispatch) => {
+  try {
+    dispatch({ type: PRODUCT_CATEGORY_LIST_REQUEST })
+
+    const { data } = await axios.get('/api/products/categories/')
+
+    dispatch({
+      type: PRODUCT_CATEGORY_LIST_SUCCESS,
+      payload: data,
+    })
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_CATEGORY_LIST_FAIL,
+      payload:
+        error.response && error.response.data.detail
+          ? error.response.data.detail
+          : error.message,
+    })
+  }
+}

@@ -20,7 +20,7 @@ function Header() {
         <Container>
           <LinkContainer to="/">
             <Navbar.Brand>
-              <img src={logo} alt="logo" height="30" />
+              <img src={logo} alt="logo" height="70" />
             </Navbar.Brand>
           </LinkContainer>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -31,7 +31,7 @@ function Header() {
             </Nav>
 
             {/* Правый Nav: корзина и профиль */}
-            <Nav className="ml-auto">
+            <Nav className="ms-auto">
               <LinkContainer to="/cart">
                 <Nav.Link>
                   <i className="fas fa-shopping-cart"></i> Корзина

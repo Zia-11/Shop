@@ -17,16 +17,23 @@ from base.products import products
 from base.models import *
 from base.serializers import ProductSerializer
 
+from base.models import Product
 # Get all the products with query
 
 
 @api_view(['GET'])
 def getProducts(request):
-    query = request.query_params.get('keyword')
-    if query == None:
-        query = ''
+    keyword  = request.query_params.get('keyword')  or ''
+    category = request.query_params.get('category') or ''
 
-    products = Product.objects.filter(name__icontains=query).order_by('-_id')
+    # сначала фильтруем по имени
+    products = Product.objects.filter(name__icontains=keyword)
+
+    # если в запросе есть category — дополнительно фильтруем
+    if category:
+        products = products.filter(category__iexact=category)
+
+    products = products.order_by('-_id')
 
     page = request.query_params.get('page')
     paginator = Paginator(products, 8)
@@ -45,6 +52,21 @@ def getProducts(request):
     serializer = ProductSerializer(products, many=True)
     return Response({'products': serializer.data, 'page': page, 'pages': paginator.num_pages})
 
+@api_view(['GET'])
+def getProductCategories(request):
+    try:
+        # получаем уникальные названия категорий
+        qs = Product.objects.values_list('category', flat=True).distinct()
+        # обязательно приводим к списку, иначе JSONRenderer падает
+        categories = list(qs)
+        return Response(categories)
+    except Exception as e:
+        # выведем ошибку в консоль сервера, чтобы понять, что не так
+        print('Error in getProductCategories:', e)
+        return Response(
+            {'detail': 'Не удалось получить список категорий'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 # Top Products
 
 

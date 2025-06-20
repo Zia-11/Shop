@@ -1,50 +1,88 @@
+// src/screens/HomeScreen.js
+
 import React, { useEffect } from "react";
-
-/* REACT-BOOTSTRAP */
-import { Row, Col } from "react-bootstrap";
-
-/* COMPONENTS */
+import { Row, Col, Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  listProducts,
+  listProductCategories,
+} from "../actions/productActions";
 import Product from "../components/Product";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
 
-/* REACT - REDUX */
-import { useDispatch, useSelector } from "react-redux";
-
-/* ACTION CREATORS */
-import { listProducts } from "../actions/productActions";
-
-function HomeScreen({ history }) {
+function HomeScreen({ match, location, history }) {
   const dispatch = useDispatch();
 
-  /* PULLING A PART OF STATE FROM THE ACTUAL STATE IN THE REDUX STORE */
-  const productList = useSelector((state) => state.productList);
-  const { products, page, pages, loading, error } = productList;
+  // достаём прямо из route-параметров
+  const category = match.params.category || "";
+  const pageNumber = match.params.pageNumber || 1;
 
-  /* FIRING OFF THE ACTION CREATORS USING DISPATCH */
+  // определяем домашняя ли это страница (чтобы не показывать карусель на /page/2)
+  const isHomePage = location.pathname === "/";
 
-  let keyword =
-    history.location
-      .search; /* IF USER SEARCHES FOR ANYTHING THEN THIS KEYWORD CHANGES AND USE EFFECT GETS TRIGGERED */
+  // стейт
+  const { loading, error, products, page, pages } = useSelector(
+    (state) => state.productList
+  );
+  const {
+    loading: loadingCat,
+    error: errorCat,
+    categories,
+  } = useSelector((state) => state.productCategoryList);
 
   useEffect(() => {
-    dispatch(listProducts(keyword));
-  }, [dispatch, keyword]);
+    dispatch(listProductCategories());
+    dispatch(listProducts(category, pageNumber));
+  }, [dispatch, category, pageNumber]);
 
   return (
-    <div>
-      {!keyword && <ProductCarousel />}
+    <>
+      {/* Карусель только на корневой */}
+      {isHomePage && <ProductCarousel />}
+
+      {/* Фильтр по категориям */}
+      <Row className="mb-4">
+        <Col>
+          {loadingCat ? (
+            <Loader />
+          ) : errorCat ? (
+            <Message variant="danger">{errorCat}</Message>
+          ) : (
+            <>
+              <Button
+                variant={category === "" ? "dark" : "light"}
+                onClick={() => history.push("/")}
+                className="me-2 mb-2"
+              >
+                Все
+              </Button>
+              {categories.map((c) => (
+                <Button
+                  key={c}
+                  variant={category === c ? "dark" : "light"}
+                  onClick={() => history.push(`/category/${c}`)}
+                  className="me-2 mb-2"
+                >
+                  {c}
+                </Button>
+              ))}
+            </>
+          )}
+        </Col>
+      </Row>
 
       <h1>Котики</h1>
 
+      {/* Сетка товаров */}
       {loading ? (
         <Loader />
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : (
-        <div>
+        <>
           <Row className="g-4">
             {products.map((product) => (
               <Col
@@ -59,19 +97,16 @@ function HomeScreen({ history }) {
               </Col>
             ))}
           </Row>
-          {/* <Row className="g-4">
-            {products.map((product) => {
-              return (
-                <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
-                  <Product product={product} />
-                </Col>
-              );
-            })}
-          </Row> */}
-          <Paginate page={page} pages={pages} keyword={keyword} />
-        </div>
+
+          {/* пагинация */}
+          <Paginate
+            page={page}
+            pages={pages}
+            category={category}
+          />
+        </>
       )}
-    </div>
+    </>
   );
 }
 
